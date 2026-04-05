@@ -36,17 +36,21 @@ finances-workspace/
 ├── CLAUDE.md                       ← You are here (always loaded)
 ├── CONTEXT.md                      ← Task router
 │
-└── ingestion/                      ← Parses receipts and invoices from photos, screenshots or PDFs
+└── ingestion/                      ← Parses receipts, invoices, and bank statements
     ├── CONTEXT.md
-    ├── docs/                       ← What fields to look for and how to transform
+    ├── docs/
+    │   ├── what-to-look-for.md
     │   ├── how-to-transform.md
-    │   └── what-to-look-for.md
-    ├── workflows/                  ← The 4-stage pipeline
-    │   ├── CONTEXT.md              ← Pipeline routing
-    │   ├── 01-extract/             ← Files pending for successful parsing go here, all new files start here
-    │   ├── 02-load/                ← Parsed documents in readable md text file
-    │   └── 03-transform/           ← Documents with a structure previously defined go here
-    └── parsed-files                ← Files successfuly parsed go here, this is the by-product
+    │   ├── bank-statement-fields.md
+    │   └── how-to-transform-bank-statement.md
+    ├── workflows/
+    │   ├── CONTEXT.md              ← Pipeline routing + detection rules
+    │   ├── 01-extract/             ← Raw files pending parsing
+    │   ├── 02-load/                ← Raw extracted text (all document types)
+    │   └── 03-transform/
+    │       ├── receipts/           ← Structured receipt/invoice outputs
+    │       └── account-statements/ ← Structured bank statement outputs
+    └── parsed-files                ← Original files after successful parsing
  
 ```
 
@@ -57,6 +61,7 @@ finances-workspace/
 | Want to... | Go here |
 |------------|---------|
 | **Parse a receipt or invoice** | `ingestion/CONTEXT.md` |
+| **Parse a bank/account statement** | `ingestion/CONTEXT.md` |
 ---
 
 
@@ -82,17 +87,19 @@ regardless of which workspace it's in.
 
 | Content Type | Pattern | Example |
 |-------------|---------|---------|
-| Parsed Receipts and Invoices | `[YYYY-MM-DD]-[commerce].md` | `2026-03-10-supermercados-nacional.md` |
+| Receipt / invoice transform | `[YYYY-MM-DD-HHMMSS]-[commerce].md` | `2026-03-10-210440-supermercados-nacional.md` |
+| Bank statement transform | `[period-end-YYYY-MM-DD]-[institution-slug]-[account-type].md` | `2026-03-31-banco-popular-credit-card.md` |
 
 ---
 
 ## File Placement Rules
 
 ### Ingestion
-- **Raw Receipts and invoices:** `ingestion/01-extract/[slug].[png|jpg|jpeg|pdf]`
-- **Parsed receipts and documents:** `ingestion/02-load/[slug].md`
-- **Structured receipts and documents:** `ingestion/03-transform/[YYYY-MM-DD-HHMMSS]-[commerce].md`
-- **Parsed Receipts and invoices:** `ingestion/parsed-files/[YYYY-MM-DD]-[slug]-[status].[png|jpg|jpeg|pdf]`
+- **Raw files (any type):** `ingestion/workflows/01-extract/[slug].[png|jpg|jpeg|pdf]`
+- **Raw extracted text:** `ingestion/workflows/02-load/[slug].md`
+- **Structured receipts:** `ingestion/workflows/03-transform/receipts/[YYYY-MM-DD-HHMMSS]-[commerce].md`
+- **Structured bank statements:** `ingestion/workflows/03-transform/account-statements/[period-end-YYYY-MM-DD]-[institution-slug]-[account-type].md`
+- **Processed originals:** `ingestion/parsed-files/[YYYY-MM-DD]-[slug]-parsed.[png|jpg|jpeg|pdf]`
 
 ---
 
@@ -107,6 +114,7 @@ try to read everything and blow their context window.
 **Each workspace is siloed.** Don't load everything.
 
 - Parsing a receipt or invoice? → Load `ingestion/docs/what-to-look-for.md`.
+- Parsing a bank statement? → Load `ingestion/docs/bank-statement-fields.md`.
 
 The CONTEXT.md files tell you what to load for each task. Trust them.
 
@@ -118,8 +126,10 @@ When the user attaches an image or PDF (jpg, jpeg, png, pdf) in the conversation
 1. Copy the file to `ingestion/workflows/01-extract/[original-filename]`
 2. Immediately run the full pipeline without waiting for further instructions:
    - Extract → see extraction rules below
-   - Load → write parsed output to `ingestion/workflows/02-load/[slug].md`
-   - Transform → write structured table to `ingestion/workflows/03-transform/[YYYY-MM-DD-HHMMSS]-[commerce].md`
+   - Load → write raw extracted text to `ingestion/workflows/02-load/[slug].md`
+   - Detect document type using signals in `ingestion/workflows/CONTEXT.md`
+   - Transform (receipt) → write to `ingestion/workflows/03-transform/receipts/[YYYY-MM-DD-HHMMSS]-[commerce].md`
+   - Transform (bank statement) → write to `ingestion/workflows/03-transform/account-statements/[period-end]-[institution-slug]-[account-type].md`
    - Move original to `ingestion/parsed-files/[YYYY-MM-DD]-[slug]-parsed.[ext]`
 
 ### Extraction Rules by File Type
