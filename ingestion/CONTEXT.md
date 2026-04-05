@@ -77,7 +77,10 @@ Each one has a WHEN (which stage) and a WHY (what it does there).
 
 | Skill / Tool | Stage | Purpose |
 |-------------|-------|---------|
-| `/glmocr` | 01-extract | When extracting data from a receipt or invoice picture|
+| `Read` (built-in) | 01-extract | Native text extraction for digital PDFs — try this first |
+| `/glmocr` | 01-extract | OCR for images (jpg/jpeg/png) and scanned/image-based PDFs |
+
+**PDF extraction order:** `Read` → if empty or garbled → `/glmocr`
 
 ---
 

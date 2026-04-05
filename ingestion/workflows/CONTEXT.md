@@ -16,7 +16,7 @@ Two stages, each in its own folder. An agent enters one stage, does its work, an
 
 | Your Task | Input | Also Load | Output | Skills at This Stage |
 |-----------|-------|-----------|--------|---------------------|
-| Extract → Load | File from `01-ingest/` | `../docs/what-to-look-for.md` | Parsed md document in `02-load/`. Original file is moved to `../parsed-files/` | /glmocr |
+| Extract → Load | File from `01-extract/` | `../docs/what-to-look-for.md` | Parsed md document in `02-load/`. Original file is moved to `../parsed-files/` | `Read` (PDF) or `/glmocr` (images / scanned PDF) |
 | Load → Transform | Markdown file from `02-load/` | `../docs/how-to-transform.md` | Final deliverable in `03-transform/` | - |
 
 ---
@@ -29,8 +29,12 @@ Pictures and screenshots of receipts and invoices that are intended to be parsed
 
 **File pattern:** `[slug].jpg`, `[slug].jpeg`, `[slug].png`, `[slug].pdf`
 
-**Skills activate here:**
-- `/glmocr` - to extract data from receipts and invoices
+**Extraction logic by file type:**
+
+| File type | Tool | Notes |
+|-----------|------|-------|
+| `.jpg` / `.jpeg` / `.png` | `/glmocr` | Always use OCR for images |
+| `.pdf` | `Read` first | If text is readable, use it. If empty or garbled, fall back to `/glmocr` |
 
 
 

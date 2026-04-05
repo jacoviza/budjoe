@@ -38,10 +38,9 @@ finances-workspace/
 │
 └── ingestion/                      ← Parses receipts and invoices from photos, screenshots or PDFs
     ├── CONTEXT.md
-    ├── docs/                       ← Voice guide, style rules, audience profiles
-    │   ├── voice.md
-    │   ├── style-guide.md
-    │   └── audience.md
+    ├── docs/                       ← What fields to look for and how to transform
+    │   ├── how-to-transform.md
+    │   └── what-to-look-for.md
     ├── workflows/                  ← The 4-stage pipeline
     │   ├── CONTEXT.md              ← Pipeline routing
     │   ├── 01-extract/             ← Files pending for successful parsing go here, all new files start here
@@ -118,10 +117,19 @@ The CONTEXT.md files tell you what to load for each task. Trust them.
 When the user attaches an image or PDF (jpg, jpeg, png, pdf) in the conversation:
 1. Copy the file to `ingestion/workflows/01-extract/[original-filename]`
 2. Immediately run the full pipeline without waiting for further instructions:
-   - Extract → `/glmocr` on the file
+   - Extract → see extraction rules below
    - Load → write parsed output to `ingestion/workflows/02-load/[slug].md`
    - Transform → write structured table to `ingestion/workflows/03-transform/[YYYY-MM-DD-HHMMSS]-[commerce].md`
    - Move original to `ingestion/parsed-files/[YYYY-MM-DD]-[slug]-parsed.[ext]`
+
+### Extraction Rules by File Type
+
+| File type | Primary tool | Fallback |
+|-----------|-------------|---------|
+| `.jpg` / `.jpeg` / `.png` | `/glmocr` | — |
+| `.pdf` | `Read` (native text extraction) | `/glmocr` if output is empty or garbled |
+
+For PDFs: attempt `Read` first. If the extracted text is readable, use it. If the output is empty, garbled, or clearly image-based, fall back to `/glmocr`.
 
 ---
 
@@ -141,6 +149,7 @@ workspace CONTEXT.md files reference them at the point of use.
 
 | Tool | Type | Used In |
 |------|------|---------|
-| `/glmocr` | Skill | parsing receipts and invoices |
+| `/glmocr` | Skill | OCR for image-based receipts/invoices (jpg, jpeg, png) and scanned PDFs |
+| `Read` | Built-in tool | Native text extraction for digital PDFs (try first before glmocr) |
 
 See each workspace's CONTEXT.md for when and how these tools get invoked.
