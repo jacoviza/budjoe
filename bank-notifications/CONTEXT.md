@@ -8,9 +8,10 @@ Scans Gmail for transactional bank push emails, extracts transaction data into i
 
 ```
 bank-notifications/
-├── CONTEXT.md              ← You are here
-├── rules.md                ← User-editable sender → institution mappings
-└── transactions/           ← Pending and imported transaction files
+├── CONTEXT.md                    ← You are here
+├── rules.md                      ← User-editable sender → institution mappings
+├── 01-transactions-to-load/      ← Pending files (status: pending), awaiting DB load
+└── 02-loaded-transactions/       ← Loaded files (status: imported), audit trail
 ```
 
 ---
@@ -19,7 +20,7 @@ bank-notifications/
 
 | Task | Command |
 |------|---------|
-| **Scan Gmail and write pending files** | Read `rules.md`, use Gmail MCP tools, write files to `transactions/` |
+| **Scan Gmail and write pending files** | Read `rules.md`, use Gmail MCP tools, write files to `01-transactions-to-load/` |
 | **Load pending files to DB** | `python db/load_notification.py` |
 | **Apply DB migration (first-time setup)** | `python db/migrate.py` |
 
@@ -30,9 +31,9 @@ bank-notifications/
 1. Read `bank-notifications/rules.md`.
 2. For each rule, call `gmail_search_messages` with the provided Gmail query.
 3. For each message returned, call `gmail_read_message` to get the full body.
-4. Before writing, scan `bank-notifications/transactions/*.md` — check each file's `email_id` frontmatter field. **Skip if a match is found** (deduplication).
+4. Before writing, scan `bank-notifications/01-transactions-to-load/*.md` **and** `bank-notifications/02-loaded-transactions/*.md` — check each file's `email_id` frontmatter field. **Skip if a match is found** (deduplication).
 5. Extract transaction fields from the email body using the extraction hints in `rules.md`.
-6. Write a new `.md` file to `bank-notifications/transactions/` using the naming convention: `[YYYY-MM-DD-HHMMSS]-[merchant-slug].md`.
+6. Write a new `.md` file to `bank-notifications/01-transactions-to-load/` using the naming convention: `[YYYY-MM-DD-HHMMSS]-[merchant-slug].md`.
 7. Set `status: pending` in the frontmatter.
 
 ### File Format
@@ -86,7 +87,7 @@ account_number_last4: 4449
 
 ## Deduplication
 
-- **Scanner-level:** Before writing, check `email_id` in all existing `*.md` files in `transactions/`. Skip if found.
+- **Scanner-level:** Before writing, check `email_id` in all `*.md` files in both `01-transactions-to-load/` and `02-loaded-transactions/`. Skip if found.
 - **DB-level:** `load_notification.py` uses `source_file` (workspace-root-relative path) as idempotency key — same pattern as receipts.
 
 ---
@@ -95,5 +96,5 @@ account_number_last4: 4449
 
 1. Never modify `db/lib.py`, `db/load_receipt.py`, or `db/load_statement.py`.
 2. All transactions loaded here enter the DB with `notification_status = 'pending'`. Approval is a separate future workflow.
-3. Never delete files from `transactions/` — they are the permanent audit trail.
+3. Never delete files — loaded files move to `02-loaded-transactions/` and remain there as the permanent audit trail.
 4. Always check `email_id` against existing files before writing a new one.

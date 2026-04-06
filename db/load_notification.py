@@ -2,9 +2,9 @@
 """
 db/load_notification.py — Import bank notification files into finance.db.
 
-Scans bank-notifications/transactions/ for files with status: pending,
+Scans bank-notifications/01-transactions-to-load/ for files with status: pending,
 loads each one into the transactions table with notification_status = 'pending',
-then updates the file status to 'imported'.
+then updates the file status to 'imported' and moves it to 02-loaded-transactions/.
 
 Idempotent: re-running on an already-imported file prints "Already imported. Skipping."
 
@@ -12,6 +12,7 @@ Usage:
     python db/load_notification.py
 """
 
+import json
 import sys
 from pathlib import Path
 
@@ -28,7 +29,49 @@ from lib import (
 )
 
 WORKSPACE_ROOT = Path(__file__).parent.parent
-TRANSACTIONS_DIR = WORKSPACE_ROOT / "bank-notifications" / "transactions"
+TRANSACTIONS_DIR = WORKSPACE_ROOT / "bank-notifications" / "01-transactions-to-load"
+LOADED_DIR = WORKSPACE_ROOT / "bank-notifications" / "02-loaded-transactions"
+ACCOUNT_TYPE_MEMORY = Path(__file__).parent / "account_type_memory.json"
+
+VALID_ACCOUNT_TYPES = ("checking", "savings", "credit_card", "loan", "mortgage", "cash")
+
+
+# ── Account-type memory ───────────────────────────────────────────────────────
+
+def _load_memory() -> dict:
+    if ACCOUNT_TYPE_MEMORY.exists():
+        return json.loads(ACCOUNT_TYPE_MEMORY.read_text(encoding="utf-8"))
+    return {}
+
+
+def _save_memory(memory: dict) -> None:
+    ACCOUNT_TYPE_MEMORY.write_text(
+        json.dumps(memory, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+
+
+def resolve_debit_card_type(institution: str, last4: str | None, memory: dict) -> str:
+    """
+    Return the real account_type for a debit card.
+    Checks memory; raises SystemExit with a structured message if not found.
+    """
+    key = f"{institution}:{last4 or 'unknown'}"
+
+    if key in memory:
+        resolved = memory[key]
+        print(f"  [memory] {key} -> {resolved}")
+        return resolved
+
+    label = f"{institution} debit card" + (f" ending in {last4}" if last4 else "")
+    print(
+        f"\nNEEDS_RESOLUTION: {key}\n"
+        f"  Unknown account type for {label}.\n"
+        f"  Add an entry to db/account_type_memory.json:\n"
+        f'    "{key}": "checking"  or  "savings"\n'
+        f"  Then re-run the loader.",
+        file=sys.stderr,
+    )
+    sys.exit(2)
 
 
 # ── Parsing ───────────────────────────────────────────────────────────────────
@@ -76,7 +119,7 @@ def get_pending_files() -> list[Path]:
 
 # ── Loader ────────────────────────────────────────────────────────────────────
 
-def load_notification(path: Path) -> bool:
+def load_notification(path: Path, memory: dict) -> bool:
     """
     Load one notification file into the transactions table.
     Returns True on success, False on error.
@@ -96,6 +139,9 @@ def load_notification(path: Path) -> bool:
         institution  = fm.get("institution", "").strip()
         account_type = fm.get("account_type", "").strip()
         last4        = fm.get("account_number_last4", "").strip() or None
+
+        if account_type == "debit_card":
+            account_type = resolve_debit_card_type(institution, last4, memory)
 
         # Required fields from table
         amount_raw   = tx.get("amount", "")
@@ -154,6 +200,8 @@ def load_notification(path: Path) -> bool:
         conn.commit()
 
     set_status(path, "imported")
+    LOADED_DIR.mkdir(exist_ok=True)
+    path.rename(LOADED_DIR / path.name)
     print(f"  Imported: {merchant} ({date}) — {amount:,.2f} {currency} [pending review]")
     return True
 
@@ -164,7 +212,7 @@ def main() -> None:
     if not TRANSACTIONS_DIR.exists():
         print(
             f"ERROR: {TRANSACTIONS_DIR} does not exist.\n"
-            "Run the scan workflow first to populate bank-notifications/transactions/",
+            "Run the scan workflow first to populate bank-notifications/01-transactions-to-load/",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -172,13 +220,14 @@ def main() -> None:
     pending = get_pending_files()
 
     if not pending:
-        print("No pending files found in bank-notifications/transactions/")
+        print("No pending files found in bank-notifications/01-transactions-to-load/")
         sys.exit(0)
 
     print(f"Loading {len(pending)} pending file(s)...\n")
+    memory = _load_memory()
     ok = err = 0
     for path in pending:
-        if load_notification(path):
+        if load_notification(path, memory):
             ok += 1
         else:
             err += 1

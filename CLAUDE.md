@@ -48,7 +48,8 @@ finances-workspace/
 ├── bank-notifications/             ← Gmail transactional emails → DB transactions
 │   ├── CONTEXT.md
 │   ├── rules.md                    ← Sender → institution rules (user-editable)
-│   └── transactions/               ← Pending/imported notification files
+│   ├── 01-transactions-to-load/    ← Pending files (status: pending)
+│   └── 02-loaded-transactions/     ← Loaded files (status: imported, audit trail)
 │
 └── ingestion/                      ← Parses receipts, invoices, and bank statements
     ├── CONTEXT.md
@@ -115,7 +116,8 @@ regardless of which workspace it's in.
 ## File Placement Rules
 
 ### Bank Notifications
-- **Notification files:** `bank-notifications/transactions/[YYYY-MM-DD-HHMMSS]-[merchant-slug].md`
+- **Notification files (pending):** `bank-notifications/01-transactions-to-load/[YYYY-MM-DD-HHMMSS]-[merchant-slug].md`
+- **Notification files (loaded):** `bank-notifications/02-loaded-transactions/[YYYY-MM-DD-HHMMSS]-[merchant-slug].md`
 
 ### Ingestion
 - **Raw files (any type):** `ingestion/workflows/01-extract/[slug].[png|jpg|jpeg|pdf]`

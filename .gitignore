@@ -1,6 +1,11 @@
+bank-notifications/01-transactions-to-load/**
+bank-notifications/02-loaded-transactions/**
+
 ingestion/workflows/01-extract/**
 ingestion/workflows/02-load/**
-ingestion/workflows/03-transform/**
+ingestion/workflows/03-transform/account-statements/**
+ingestion/workflows/03-transform/transactions/**
+ingestion/workflows/03-transform/receipts/**
 ingestion/parsed-files/**
 db/finance.db**
 db/__pycache__/**

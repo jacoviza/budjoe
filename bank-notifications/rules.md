@@ -7,17 +7,16 @@ The agent reads this file before scanning Gmail.
 
 ## BHD
 
-**Sender:** `notificaciones@bhd.com.do`
+**Sender:** `Alertas@bhd.com.do`, `notificaciones@bhd.com.do`, `notificaciones@bhdleon.com.do`
 
 **Subject patterns (any match triggers extraction):**
-- `Transacción con tu tarjeta BHD`
-- `Cargo en tu tarjeta BHD`
-- `Compra aprobada BHD`
-- `Transaction approved`
+- `Transacciones entre productos BHD y a otros Bancos`
+- `Pago de Servicio e Impuestos`
+- `BHD Notificación de Transacciones`
 
 **Gmail query:**
 ```
-from:notificaciones@bhd.com.do (subject:Transacción OR subject:Cargo OR subject:"Compra aprobada" OR subject:"Transaction approved")
+from:Alertas@bhd.com.do OR from:notificaciones@bhdleon.com.do (subject:"Transacciones entre productos BHD y a otros Bancos" OR subject:"Pago de Servicio e Impuestos" OR subject:"BHD Notificación de Transacciones")
 ```
 
 **Institution:** `BHD`
