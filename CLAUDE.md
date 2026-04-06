@@ -45,6 +45,11 @@ finances-workspace/
 │   ├── load_receipt.py             ← Receipt importer
 │   └── finance.db                  ← SQLite database (auto-created)
 │
+├── bank-notifications/             ← Gmail transactional emails → DB transactions
+│   ├── CONTEXT.md
+│   ├── rules.md                    ← Sender → institution rules (user-editable)
+│   └── transactions/               ← Pending/imported notification files
+│
 └── ingestion/                      ← Parses receipts, invoices, and bank statements
     ├── CONTEXT.md
     ├── docs/
@@ -73,6 +78,8 @@ finances-workspace/
 | **Parse a bank/account statement** | `ingestion/CONTEXT.md` |
 | **Persist a transform to the DB** | Run `python db/load_statement.py <file>` or `python db/load_receipt.py <file>` |
 | **Apply schema migrations** | Run `python db/migrate.py` |
+| **Scan Gmail for bank notifications** | `bank-notifications/CONTEXT.md` |
+| **Load bank notifications to DB** | `python db/load_notification.py` |
 
 ---
 
@@ -101,10 +108,14 @@ regardless of which workspace it's in.
 |-------------|---------|---------|
 | Receipt / invoice transform | `[YYYY-MM-DD-HHMMSS]-[commerce].md` | `2026-03-10-210440-supermercados-nacional.md` |
 | Bank statement transform | `[period-end-YYYY-MM-DD]-[institution-slug]-[account-type].md` | `2026-03-31-banco-popular-credit-card.md` |
+| Bank notification | `[YYYY-MM-DD-HHMMSS]-[merchant-slug].md` | `2026-04-04-102300-supermercados-nacional.md` |
 
 ---
 
 ## File Placement Rules
+
+### Bank Notifications
+- **Notification files:** `bank-notifications/transactions/[YYYY-MM-DD-HHMMSS]-[merchant-slug].md`
 
 ### Ingestion
 - **Raw files (any type):** `ingestion/workflows/01-extract/[slug].[png|jpg|jpeg|pdf]`
@@ -127,6 +138,7 @@ try to read everything and blow their context window.
 
 - Parsing a receipt or invoice? → Load `ingestion/docs/what-to-look-for.md`.
 - Parsing a bank statement? → Load `ingestion/docs/bank-statement-fields.md`.
+- Scanning bank notification emails? → Load `bank-notifications/rules.md`, then `bank-notifications/CONTEXT.md`.
 
 The CONTEXT.md files tell you what to load for each task. Trust them.
 
@@ -182,5 +194,6 @@ workspace CONTEXT.md files reference them at the point of use.
 |------|------|---------|
 | `/glmocr` | Skill | OCR for image-based receipts/invoices (jpg, jpeg, png) and scanned PDFs |
 | `Read` | Built-in tool | Native text extraction for digital PDFs (try first before glmocr) |
+| Gmail MCP | `mcp__claude_ai_Gmail__*` | Bank notification email scan workflow |
 
 See each workspace's CONTEXT.md for when and how these tools get invoked.
