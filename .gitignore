@@ -2,3 +2,5 @@ ingestion/workflows/01-extract/**
 ingestion/workflows/02-load/**
 ingestion/workflows/03-transform/**
 ingestion/parsed-files/**
+db/finance.db**
+db/__pycache__/**

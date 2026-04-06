@@ -36,6 +36,15 @@ finances-workspace/
 ├── CLAUDE.md                       ← You are here (always loaded)
 ├── CONTEXT.md                      ← Task router
 │
+├── db/                             ← SQLite persistence layer
+│   ├── migrations/                 ← Versioned SQL migration files
+│   │   └── 001_initial_schema.sql
+│   ├── migrate.py                  ← Migration runner
+│   ├── lib.py                      ← Shared DB utilities
+│   ├── load_statement.py           ← Statement importer
+│   ├── load_receipt.py             ← Receipt importer
+│   └── finance.db                  ← SQLite database (auto-created)
+│
 └── ingestion/                      ← Parses receipts, invoices, and bank statements
     ├── CONTEXT.md
     ├── docs/
@@ -62,6 +71,9 @@ finances-workspace/
 |------------|---------|
 | **Parse a receipt or invoice** | `ingestion/CONTEXT.md` |
 | **Parse a bank/account statement** | `ingestion/CONTEXT.md` |
+| **Persist a transform to the DB** | Run `python db/load_statement.py <file>` or `python db/load_receipt.py <file>` |
+| **Apply schema migrations** | Run `python db/migrate.py` |
+
 ---
 
 
@@ -130,7 +142,16 @@ When the user attaches an image or PDF (jpg, jpeg, png, pdf) in the conversation
    - Detect document type using signals in `ingestion/workflows/CONTEXT.md`
    - Transform (receipt) → write to `ingestion/workflows/03-transform/receipts/[YYYY-MM-DD-HHMMSS]-[commerce].md`
    - Transform (bank statement) → write to `ingestion/workflows/03-transform/account-statements/[period-end]-[institution-slug]-[account-type].md`
+   - Persist to DB → `python db/load_statement.py <transform-file>` or `python db/load_receipt.py <transform-file>`
    - Move original to `ingestion/parsed-files/[YYYY-MM-DD]-[slug]-parsed.[ext]`
+
+### DB Persistence
+
+`db/finance.db` is created automatically on first `python db/migrate.py`. The loaders are idempotent — re-running on an already-imported file prints "Already imported. Skipping." and exits 0.
+
+**Receipts:** the loader prompts you to select which account was used. If no real accounts exist yet, it defaults to a virtual cash account.
+
+**Schema changes:** add a new numbered file to `db/migrations/` (e.g. `002_add_notes.sql`) and re-run `python db/migrate.py`. Never edit already-applied migration files.
 
 ### Extraction Rules by File Type
 

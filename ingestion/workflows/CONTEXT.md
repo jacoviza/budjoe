@@ -5,8 +5,8 @@
 Three stages, each in its own folder. An agent enters one stage, does its work, and outputs to the next.
 
 ```
-01-extract/  →  02-load/  →  [detect type]  →  03-transform/receipts/
-  (extract)       (load)                     └─  03-transform/account-statements/
+01-extract/  →  02-load/  →  [detect type]  →  03-transform/receipts/       →  db/finance.db
+  (extract)       (load)                     └─  03-transform/account-statements/  →  db/finance.db
 ```
 
 ---
@@ -18,6 +18,8 @@ Three stages, each in its own folder. An agent enters one stage, does its work, 
 | Extract → Load | File from `01-extract/` | `../docs/what-to-look-for.md` | Parsed md document in `02-load/`. Original file is moved to `../parsed-files/` | `Read` (PDF) or `/glmocr` (images / scanned PDF) |
 | Load → Transform (receipt) | `02-load/[slug].md` | `../docs/how-to-transform.md` | `03-transform/receipts/[YYYY-MM-DD-HHMMSS]-[commerce].md` | — |
 | Load → Transform (bank statement) | `02-load/[slug].md` | `../docs/bank-statement-fields.md` + `../docs/how-to-transform-bank-statement.md` | `03-transform/account-statements/[period-end-YYYY-MM-DD]-[institution-slug]-[account-type].md` | — |
+| Transform → DB (receipt) | `03-transform/receipts/[file].md` | — | Row(s) in `db/finance.db` | `python db/load_receipt.py <file>` |
+| Transform → DB (bank statement) | `03-transform/account-statements/[file].md` | — | Row(s) in `db/finance.db` | `python db/load_statement.py <file>` |
 
 ---
 
@@ -105,10 +107,11 @@ Load `../docs/bank-statement-fields.md` and `../docs/how-to-transform-bank-state
 
 ## Pipeline Rules
 
-1. **Flow is forward.** extract → load → detect → transform. No skipping stages.
+1. **Flow is forward.** extract → load → detect → transform → persist. No skipping stages.
 2. **Each agent loads only what it needs.** See the routing table above.
 3. **The parser does not have creative freedom.** It must return only the expected data.
 4. **Detection happens at transform time**, not extract time. Always write to `02-load/` first.
+5. **Persist after every transform.** Run the appropriate loader after writing a transform file. Loaders are idempotent — safe to re-run.
 
 ---
 
@@ -117,9 +120,9 @@ Load `../docs/bank-statement-fields.md` and `../docs/how-to-transform-bank-state
 ```
 01-extract/          02-load/           detect type        03-transform/
                     ┌─────────────┐                       ┌──────────────────────┐
-                    │ /glmocr     │ ──→ receipt ────────→ │ receipts/            │
+                    │ /glmocr     │ ──→ receipt ────────→ │ receipts/            │ ──→ db/finance.db
                     │  or Read    │                        └──────────────────────┘
                     └─────────────┘ ──→ bank statement ─→ ┌──────────────────────┐
-                                                           │ account-statements/  │
+                                                           │ account-statements/  │ ──→ db/finance.db
                                                            └──────────────────────┘
 ```
