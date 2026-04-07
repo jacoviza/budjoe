@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { Transaction } from '../types';
 import styles from './NotificationsPage.module.css';
+import InlineEditCell from '../components/transactions/InlineEditCell';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Transaction[]>([]);
@@ -9,6 +10,7 @@ export default function NotificationsPage() {
   const [error, setError] = useState('');
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [updating, setUpdating] = useState(false);
+  const [descriptionOverrides, setDescriptionOverrides] = useState<Record<number, string>>({});
 
   useEffect(() => {
     const fetch = async () => {
@@ -131,6 +133,7 @@ export default function NotificationsPage() {
                 </th>
                 <th>Date</th>
                 <th>Merchant</th>
+                <th>Description</th>
                 <th>Amount</th>
                 <th>Type</th>
                 <th>Currency</th>
@@ -149,6 +152,16 @@ export default function NotificationsPage() {
                   </td>
                   <td>{tx.date}</td>
                   <td>{tx.merchant}</td>
+                  <td>
+                    <InlineEditCell
+                      value={descriptionOverrides[tx.id] !== undefined ? descriptionOverrides[tx.id] : tx.description}
+                      onSave={async (v) => {
+                        await api.updateTransaction(tx.id, { description: v });
+                        setDescriptionOverrides((prev) => ({ ...prev, [tx.id]: v }));
+                      }}
+                      placeholder="Add description…"
+                    />
+                  </td>
                   <td className={styles.amount}>
                     {tx.amount.toLocaleString('en-US', {
                       minimumFractionDigits: 2,

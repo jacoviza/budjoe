@@ -52,6 +52,7 @@ class Transaction(BaseModel):
     statement_id: Optional[int]
     date: str
     merchant: str
+    description: Optional[str]
     currency: str
     debit: Optional[float]
     credit: Optional[float]
@@ -84,6 +85,7 @@ class TransactionPage(BaseModel):
 class TransactionUpdate(BaseModel):
     """Update fields for a transaction."""
     merchant: Optional[str] = None
+    description: Optional[str] = None
     date: Optional[str] = None
     amount: Optional[float] = None
     tx_type: Optional[str] = None  # 'debit' | 'credit'
@@ -129,6 +131,7 @@ class DuplicateTransaction(BaseModel):
     id: int
     date: str
     merchant: str
+    description: Optional[str]
     amount: float
     tx_type: str
     currency: str

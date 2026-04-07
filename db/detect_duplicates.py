@@ -47,12 +47,12 @@ def fetch_groups(conn) -> list[dict]:
     """Return all unresolved duplicate groups as a list of dicts."""
     rows = conn.execute(
         """
-        SELECT date, merchant, amount, account_id,
+        SELECT date, amount, account_id, tx_type,
                GROUP_CONCAT(id) AS ids
         FROM (SELECT * FROM transactions WHERE duplicate_of IS NULL ORDER BY id)
-        GROUP BY date, merchant, amount, account_id
+        GROUP BY date, amount, account_id, tx_type
         HAVING COUNT(*) > 1
-        ORDER BY date DESC, merchant
+        ORDER BY date DESC
         """
     ).fetchall()
 

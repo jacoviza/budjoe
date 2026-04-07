@@ -15,6 +15,7 @@ export default function TransactionEditModal({
   onSave,
 }: TransactionEditModalProps) {
   const [merchant, setMerchant] = useState(transaction.merchant);
+  const [description, setDescription] = useState(transaction.description ?? '');
   const [date, setDate] = useState(transaction.date);
   const [amount, setAmount] = useState(transaction.amount.toString());
   const [txType, setTxType] = useState(transaction.tx_type);
@@ -26,6 +27,7 @@ export default function TransactionEditModal({
       setSaving(true);
       const updates: TransactionUpdate = {};
       if (merchant !== transaction.merchant) updates.merchant = merchant;
+      if (description !== (transaction.description ?? '')) updates.description = description;
       if (date !== transaction.date) updates.date = date;
       if (parseFloat(amount) !== transaction.amount) {
         updates.amount = parseFloat(amount);
@@ -60,6 +62,16 @@ export default function TransactionEditModal({
               type="text"
               value={merchant}
               onChange={(e) => setMerchant(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Description</label>
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Optional description"
             />
           </div>
 

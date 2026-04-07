@@ -19,6 +19,7 @@ def _row_to_transaction(row) -> Transaction:
         statement_id=row["statement_id"],
         date=row["date"],
         merchant=row["merchant"],
+        description=row["description"],
         currency=row["currency"],
         debit=row["debit"],
         credit=row["credit"],
@@ -61,6 +62,8 @@ def update_transaction(tx_id: int, body: TransactionUpdate) -> Transaction:
         updates = {}
         if body.merchant is not None:
             updates["merchant"] = body.merchant
+        if body.description is not None:
+            updates["description"] = body.description
         if body.date is not None:
             updates["date"] = body.date
         if body.amount is not None:

@@ -148,6 +148,7 @@ def get_account_transactions(
                 statement_id=r["statement_id"],
                 date=r["date"],
                 merchant=r["merchant"],
+                description=r["description"],
                 currency=r["currency"],
                 debit=r["debit"],
                 credit=r["credit"],

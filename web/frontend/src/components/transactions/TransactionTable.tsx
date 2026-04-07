@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../../api/client';
 import { Transaction, TransactionPage } from '../../types';
 import styles from './TransactionTable.module.css';
+import InlineEditCell from './InlineEditCell';
 
 interface TransactionTableProps {
   accountId: number;
@@ -19,6 +20,7 @@ export default function TransactionTable({
   const [error, setError] = useState('');
   const [limit] = useState(50);
   const [offset, setOffset] = useState(0);
+  const [descriptionOverrides, setDescriptionOverrides] = useState<Record<number, string>>({});
 
   useEffect(() => {
     const fetch = async () => {
@@ -53,6 +55,7 @@ export default function TransactionTable({
           <tr>
             <th>Date</th>
             <th>Merchant</th>
+            <th>Description</th>
             <th>Amount</th>
             <th>Type</th>
             <th>Status</th>
@@ -65,6 +68,16 @@ export default function TransactionTable({
               <tr key={tx.id}>
                 <td>{tx.date}</td>
                 <td>{tx.merchant}</td>
+                <td>
+                  <InlineEditCell
+                    value={descriptionOverrides[tx.id] !== undefined ? descriptionOverrides[tx.id] : tx.description}
+                    onSave={async (v) => {
+                      await api.updateTransaction(tx.id, { description: v });
+                      setDescriptionOverrides((prev) => ({ ...prev, [tx.id]: v }));
+                    }}
+                    placeholder="Add description…"
+                  />
+                </td>
                 <td className={styles.amount}>
                   {tx.amount.toLocaleString('en-US', {
                     minimumFractionDigits: 2,
@@ -100,7 +113,7 @@ export default function TransactionTable({
             ))
           ) : (
             <tr>
-              <td colSpan={6} className={styles.noData}>
+              <td colSpan={7} className={styles.noData}>
                 No transactions
               </td>
             </tr>

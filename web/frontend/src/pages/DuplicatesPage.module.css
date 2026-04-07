@@ -225,6 +225,59 @@
   color: var(--success-text);
 }
 
+/* ── Merchant inline edit ────────────────────────────────── */
+
+.merchantEditBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.merchantEditBtn:hover .editIcon {
+  opacity: 1;
+}
+
+.editIcon {
+  opacity: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.merchantInput {
+  width: 100%;
+  font-size: 13px;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--accent-color);
+  border-radius: 4px;
+  padding: 2px 6px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.merchantSaving {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.emptyFieldHint {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 /* ── Action bar ──────────────────────────────────────────── */
 
 .actionBar {

@@ -18,6 +18,7 @@ def _row_to_transaction(row) -> Transaction:
         statement_id=row["statement_id"],
         date=row["date"],
         merchant=row["merchant"],
+        description=row["description"],
         currency=row["currency"],
         debit=row["debit"],
         credit=row["credit"],
@@ -28,6 +29,7 @@ def _row_to_transaction(row) -> Transaction:
         source_file=row["source_file"],
         imported_at=row["imported_at"],
         notification_status=row["notification_status"],
+        duplicate_of=row["duplicate_of"],
         account_label=None,
     )
 

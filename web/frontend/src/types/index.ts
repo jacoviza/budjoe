@@ -40,6 +40,7 @@ export interface Transaction {
   statement_id: number | null;
   date: string;
   merchant: string;
+  description: string | null;
   currency: string;
   debit: number | null;
   credit: number | null;
@@ -58,6 +59,7 @@ export interface DuplicateTransaction {
   id: number;
   date: string;
   merchant: string;
+  description: string | null;
   amount: number;
   tx_type: string;
   currency: string;
@@ -105,6 +107,7 @@ export interface TransactionPage {
 
 export interface TransactionUpdate {
   merchant?: string;
+  description?: string;
   date?: string;
   amount?: number;
   tx_type?: string;

@@ -54,12 +54,12 @@ def _fetch_groups(conn, limit: int, offset: int) -> tuple[list[DuplicateGroup], 
     # Find all candidate groups: same key, no member already confirmed as duplicate
     rows = conn.execute(
         """
-        SELECT date, merchant, amount, account_id,
+        SELECT date, amount, account_id, tx_type,
                GROUP_CONCAT(id) AS ids
         FROM (SELECT * FROM transactions WHERE duplicate_of IS NULL ORDER BY id)
-        GROUP BY date, merchant, amount, account_id
+        GROUP BY date, amount, account_id, tx_type
         HAVING COUNT(*) > 1
-        ORDER BY date DESC, merchant
+        ORDER BY date DESC
         """
     ).fetchall()
 
@@ -77,7 +77,7 @@ def _fetch_groups(conn, limit: int, offset: int) -> tuple[list[DuplicateGroup], 
 
     groups = []
     for row, ids in page:
-        key = f"{row['date']}|{row['merchant']}|{row['amount']}|{row['account_id']}"
+        key = f"{row['date']}|{row['amount']}|{row['account_id']}|{row['tx_type']}"
         tx_rows = conn.execute(
             f"SELECT * FROM transactions WHERE id IN ({','.join('?' * len(ids))})",
             ids,
@@ -88,6 +88,7 @@ def _fetch_groups(conn, limit: int, offset: int) -> tuple[list[DuplicateGroup], 
                 id=r["id"],
                 date=r["date"],
                 merchant=r["merchant"],
+                description=r["description"],
                 amount=r["amount"],
                 tx_type=r["tx_type"],
                 currency=r["currency"],
@@ -120,9 +121,9 @@ def get_duplicate_stats() -> DuplicateStats:
     with get_connection() as conn:
         rows = conn.execute(
             """
-            SELECT GROUP_CONCAT(id) AS ids, date, merchant, amount, account_id
+            SELECT GROUP_CONCAT(id) AS ids, date, amount, account_id, tx_type
             FROM (SELECT * FROM transactions WHERE duplicate_of IS NULL ORDER BY id)
-            GROUP BY date, merchant, amount, account_id
+            GROUP BY date, amount, account_id, tx_type
             HAVING COUNT(*) > 1
             """
         ).fetchall()
@@ -215,7 +216,7 @@ def _confirm_all(conn, ids: list[int]) -> None:
         )
     for dup_id in ids[1:]:
         conn.execute(
-            "UPDATE transactions SET duplicate_of = ? WHERE id = ?",
+            "UPDATE transactions SET duplicate_of = ?, notification_status = 'rejected' WHERE id = ?",
             (original_id, dup_id),
         )
 
@@ -255,7 +256,7 @@ def _confirm_selected(conn, all_ids: list[int], selected_ids: list[int]) -> None
         )
     for dup_id in selected_ids[1:]:
         conn.execute(
-            "UPDATE transactions SET duplicate_of = ? WHERE id = ?",
+            "UPDATE transactions SET duplicate_of = ?, notification_status = 'rejected' WHERE id = ?",
             (original_id, dup_id),
         )
 

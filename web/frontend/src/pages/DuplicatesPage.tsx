@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { api } from '../api/client';
 import { DuplicateGroup, DuplicateTransaction } from '../types';
 import styles from './DuplicatesPage.module.css';
@@ -33,11 +33,69 @@ function formatDate(iso: string): string {
 
 interface TxColProps {
   tx: DuplicateTransaction;
+  merchantOverride?: string;
+  descriptionOverride?: string | null;
   checked: boolean;
   onToggle: (id: number) => void;
+  onMerchantSaved: (id: number, merchant: string) => void;
+  onDescriptionSaved: (id: number, description: string) => void;
 }
 
-function TxColumn({ tx, checked, onToggle }: TxColProps) {
+function useInlineEdit(
+  current: string,
+  onSave: (value: string) => Promise<void>,
+  allowEmpty = false,
+) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(current);
+  const [saving, setSaving] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const startEdit = () => {
+    setDraft(current);
+    setEditing(true);
+    setTimeout(() => inputRef.current?.select(), 0);
+  };
+
+  const cancel = () => { setEditing(false); setDraft(current); };
+
+  const save = async () => {
+    const trimmed = draft.trim();
+    if (trimmed === current || (!allowEmpty && !trimmed)) { cancel(); return; }
+    setSaving(true);
+    try {
+      await onSave(trimmed);
+      setEditing(false);
+    } catch {
+      setDraft(current);
+      setEditing(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') save();
+    if (e.key === 'Escape') cancel();
+  };
+
+  return { editing, draft, saving, inputRef, setDraft, startEdit, save, handleKeyDown };
+}
+
+function TxColumn({ tx, merchantOverride, descriptionOverride, checked, onToggle, onMerchantSaved, onDescriptionSaved }: TxColProps) {
+  const displayMerchant = merchantOverride ?? tx.merchant;
+  const displayDescription = descriptionOverride !== undefined ? descriptionOverride : tx.description;
+
+  const merchant = useInlineEdit(displayMerchant, async (v) => {
+    await api.updateTransaction(tx.id, { merchant: v });
+    onMerchantSaved(tx.id, v);
+  });
+
+  const description = useInlineEdit(displayDescription ?? '', async (v) => {
+    await api.updateTransaction(tx.id, { description: v });
+    onDescriptionSaved(tx.id, v);
+  }, true);
+
   return (
     <div className={styles.txCol}>
       <div className={styles.txColHeader}>
@@ -47,6 +105,54 @@ function TxColumn({ tx, checked, onToggle }: TxColProps) {
         </span>
       </div>
       <div className={styles.txColBody}>
+        <div className={styles.txField}>
+          <span className={styles.txFieldLabel}>Merchant</span>
+          {merchant.editing ? (
+            <input
+              ref={merchant.inputRef}
+              className={styles.merchantInput}
+              value={merchant.draft}
+              onChange={(e) => merchant.setDraft(e.target.value)}
+              onBlur={merchant.save}
+              onKeyDown={merchant.handleKeyDown}
+              disabled={merchant.saving}
+              autoFocus
+            />
+          ) : (
+            <button
+              className={`${styles.merchantEditBtn} ${merchant.saving ? styles.merchantSaving : ''}`}
+              onClick={merchant.startEdit}
+              title="Click to edit merchant"
+            >
+              {displayMerchant}
+              <span className={styles.editIcon}>✎</span>
+            </button>
+          )}
+        </div>
+        <div className={styles.txField}>
+          <span className={styles.txFieldLabel}>Description</span>
+          {description.editing ? (
+            <input
+              ref={description.inputRef}
+              className={styles.merchantInput}
+              value={description.draft}
+              onChange={(e) => description.setDraft(e.target.value)}
+              onBlur={description.save}
+              onKeyDown={description.handleKeyDown}
+              disabled={description.saving}
+              autoFocus
+            />
+          ) : (
+            <button
+              className={`${styles.merchantEditBtn} ${description.saving ? styles.merchantSaving : ''}`}
+              onClick={description.startEdit}
+              title="Click to add description"
+            >
+              {displayDescription || <span className={styles.emptyFieldHint}>Add description…</span>}
+              <span className={styles.editIcon}>✎</span>
+            </button>
+          )}
+        </div>
         <div className={styles.txField}>
           <span className={styles.txFieldLabel}>Date</span>
           <span className={styles.txFieldValue}>{formatDate(tx.date)}</span>
@@ -96,8 +202,19 @@ interface GroupCardProps {
 
 function GroupCard({ group, onResolved, onSkip }: GroupCardProps) {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [merchantOverrides, setMerchantOverrides] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [descriptionOverrides, setDescriptionOverrides] = useState<Record<number, string>>({});
+
+  const handleMerchantSaved = (id: number, merchant: string) => {
+    setMerchantOverrides((prev) => ({ ...prev, [id]: merchant }));
+  };
+
+  const handleDescriptionSaved = (id: number, desc: string) => {
+    setDescriptionOverrides((prev) => ({ ...prev, [id]: desc }));
+  };
 
   const txs = group.transactions;
   const allIds = txs.map((t) => t.id);
@@ -157,8 +274,12 @@ function GroupCard({ group, onResolved, onSkip }: GroupCardProps) {
           <TxColumn
             key={tx.id}
             tx={tx}
+            merchantOverride={merchantOverrides[tx.id]}
+            descriptionOverride={descriptionOverrides[tx.id]}
             checked={selectedIds.has(tx.id)}
             onToggle={toggleCheck}
+            onMerchantSaved={handleMerchantSaved}
+            onDescriptionSaved={handleDescriptionSaved}
           />
         ))}
       </div>
