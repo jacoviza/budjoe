@@ -50,7 +50,47 @@ export interface Transaction {
   source_file: string;
   imported_at: string;
   notification_status: string | null;
+  duplicate_of: number | null;
   account_label: string | null;
+}
+
+export interface DuplicateTransaction {
+  id: number;
+  date: string;
+  merchant: string;
+  amount: number;
+  tx_type: string;
+  currency: string;
+  account_id: number;
+  account_label: string | null;
+  source_file: string;
+  statement_id: number | null;
+  notification_status: string | null;
+  imported_at: string;
+  duplicate_of: number | null;
+}
+
+export interface DuplicateGroup {
+  key: string;
+  transactions: DuplicateTransaction[];
+}
+
+export interface DuplicateGroupPage {
+  groups: DuplicateGroup[];
+  total: number;
+}
+
+export interface DuplicateStats {
+  total_groups: number;
+  total_duplicate_transactions: number;
+}
+
+export type ResolveAction = 'confirm_all' | 'dismiss_all' | 'confirm_selected';
+
+export interface ResolveDuplicatesRequest {
+  transaction_ids: number[];
+  action: ResolveAction;
+  selected_duplicate_ids?: number[];
 }
 
 export interface AccountDetail {

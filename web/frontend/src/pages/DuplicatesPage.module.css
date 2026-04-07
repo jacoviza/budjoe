@@ -1,0 +1,396 @@
+.container {
+  max-width: 860px;
+}
+
+/* ── Page header ─────────────────────────────────────────── */
+
+.pageHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.pageTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.groupBadge {
+  font-size: 13px;
+  font-weight: 600;
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+/* ── Progress ────────────────────────────────────────────── */
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.progressLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.progressTrack {
+  flex: 1;
+  height: 6px;
+  background-color: var(--border-color);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: var(--accent-color);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* ── Group card ──────────────────────────────────────────── */
+
+.groupCard {
+  background-color: var(--bg-primary);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.groupCardHeader {
+  padding: 16px 20px;
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.groupMerchant {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.groupMeta {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.groupAmount {
+  margin-left: auto;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: monospace;
+  color: var(--text-primary);
+}
+
+/* ── Transaction comparison grid ────────────────────────── */
+
+.txGrid {
+  display: grid;
+  grid-template-columns: repeat(var(--tx-count, 2), 1fr);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.txGridCheckCol {
+  background-color: var(--bg-tertiary);
+  border-right: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+}
+
+.txCheckCell {
+  padding: 16px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.txCheckCell:last-child {
+  border-bottom: none;
+}
+
+.txCheckCell input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent-color);
+  margin-top: 2px;
+  padding: 0;
+  border: none;
+}
+
+.txCol {
+  border-right: 1px solid var(--border-light);
+  min-width: 0;
+}
+
+.txCol:last-child {
+  border-right: none;
+}
+
+.txColHeader {
+  padding: 10px 14px;
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.txIdChip {
+  display: inline-block;
+  background-color: var(--accent-color);
+  color: #fff;
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.txColBody {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.txField {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.txFieldLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+}
+
+.txFieldValue {
+  font-size: 13px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.txFieldValueMono {
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.sourceBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.sourceBadgeStatement {
+  background-color: var(--info-bg);
+  color: var(--accent-color);
+}
+
+.sourceBadgeNotification {
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.sourceBadgeReceipt {
+  background-color: var(--success-bg);
+  color: var(--success-text);
+}
+
+/* ── Action bar ──────────────────────────────────────────── */
+
+.actionBar {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btnConfirm {
+  padding: 9px 18px;
+  background-color: var(--danger-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.btnConfirm:hover:not(:disabled) {
+  background-color: var(--danger-text);
+}
+
+.btnDismiss {
+  padding: 9px 18px;
+  background-color: var(--success-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btnDismiss:hover:not(:disabled) {
+  background-color: var(--success-text);
+}
+
+.btnConfirmSelected {
+  padding: 9px 18px;
+  background-color: var(--warning-color);
+  color: var(--warning-text);
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btnConfirmSelected:hover:not(:disabled) {
+  filter: brightness(0.9);
+}
+
+.btnSkip {
+  margin-left: auto;
+  padding: 9px 18px;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btnSkip:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.btnConfirm:disabled,
+.btnDismiss:disabled,
+.btnConfirmSelected:disabled,
+.btnSkip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.selectionHint {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: var(--bg-primary);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.emptyIcon {
+  font-size: 52px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.emptyTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.emptySubtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* ── Loading / error ─────────────────────────────────────── */
+
+.loadingBox,
+.errorBox {
+  padding: 20px;
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.errorBox {
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid var(--danger-color);
+}
+
+/* ── Navigation ──────────────────────────────────────────── */
+
+.navRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.navBtn {
+  padding: 7px 16px;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.navBtn:hover:not(:disabled) {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.navBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.navCounter {
+  font-size: 13px;
+  color: var(--text-secondary);
+}

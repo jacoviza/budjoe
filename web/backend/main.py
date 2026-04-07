@@ -5,7 +5,7 @@ Finance Control Panel - FastAPI backend
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import accounts, transactions, notifications, actions
+from routers import accounts, transactions, notifications, actions, duplicates
 
 app = FastAPI(
     title="Finance Control Panel",
@@ -25,6 +25,7 @@ app.include_router(accounts.router, prefix="/api/accounts", tags=["accounts"])
 app.include_router(transactions.router, prefix="/api/transactions", tags=["transactions"])
 app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
 app.include_router(actions.router, prefix="/api/actions", tags=["actions"])
+app.include_router(duplicates.router, prefix="/api/duplicates", tags=["duplicates"])
 
 
 @app.get("/health")

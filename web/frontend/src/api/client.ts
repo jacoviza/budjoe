@@ -12,6 +12,9 @@ import {
   PendingFilesResult,
   NotificationStatusUpdate,
   BulkNotificationUpdate,
+  DuplicateGroupPage,
+  DuplicateStats,
+  ResolveDuplicatesRequest,
 } from '../types';
 
 const BASE = '/api';
@@ -113,6 +116,26 @@ export const api = {
       transaction_ids: ids,
       status,
     });
+  },
+
+  // Duplicates
+  async getDuplicateGroups(params?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<DuplicateGroupPage> {
+    const query = new URLSearchParams();
+    if (params?.limit) query.append('limit', params.limit.toString());
+    if (params?.offset !== undefined) query.append('offset', params.offset.toString());
+    const qs = query.toString();
+    return request('GET', `/duplicates/groups${qs ? `?${qs}` : ''}`);
+  },
+
+  async getDuplicateStats(): Promise<DuplicateStats> {
+    return request('GET', '/duplicates/stats');
+  },
+
+  async resolveDuplicates(body: ResolveDuplicatesRequest): Promise<{ status: string; action: string }> {
+    return request('POST', '/duplicates/resolve', body);
   },
 
   // Actions

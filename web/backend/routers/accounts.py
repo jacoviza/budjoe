@@ -109,7 +109,7 @@ def get_account_transactions(
             raise HTTPException(status_code=404, detail="Account not found")
 
         # Build query
-        where_clauses = ["account_id = ?"]
+        where_clauses = ["account_id = ?", "duplicate_of IS NULL"]
         params = [account_id]
 
         if date_from:
@@ -158,6 +158,7 @@ def get_account_transactions(
                 source_file=r["source_file"],
                 imported_at=r["imported_at"],
                 notification_status=r["notification_status"],
+                duplicate_of=r["duplicate_of"],
                 account_label=None,
             )
             for r in rows

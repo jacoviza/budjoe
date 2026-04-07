@@ -29,6 +29,7 @@ def _row_to_transaction(row) -> Transaction:
         source_file=row["source_file"],
         imported_at=row["imported_at"],
         notification_status=row["notification_status"],
+        duplicate_of=row["duplicate_of"],
         account_label=None,
     )
 

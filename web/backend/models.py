@@ -2,6 +2,8 @@
 Pydantic models for API request/response shapes.
 """
 
+from enum import Enum
+
 from pydantic import BaseModel
 from typing import Optional
 
@@ -60,6 +62,7 @@ class Transaction(BaseModel):
     source_file: str
     imported_at: str
     notification_status: Optional[str]
+    duplicate_of: Optional[int]
     # Denormalized for display
     account_label: Optional[str]
 
@@ -117,3 +120,53 @@ class PendingFilesResult(BaseModel):
     notification_files: list[str]  # filenames only
     receipt_transforms: list[str]
     statement_transforms: list[str]
+
+
+# ===== Duplicate Detection Models =====
+
+class DuplicateTransaction(BaseModel):
+    """A transaction as shown inside a duplicate group."""
+    id: int
+    date: str
+    merchant: str
+    amount: float
+    tx_type: str
+    currency: str
+    account_id: int
+    account_label: Optional[str]
+    source_file: str
+    statement_id: Optional[int]
+    notification_status: Optional[str]
+    imported_at: str
+    duplicate_of: Optional[int]
+
+
+class DuplicateGroup(BaseModel):
+    """A group of transactions sharing the same (date, merchant, amount, account_id)."""
+    key: str  # "{date}|{merchant}|{amount}|{account_id}"
+    transactions: list[DuplicateTransaction]
+
+
+class DuplicateGroupPage(BaseModel):
+    """Paginated list of unresolved duplicate groups."""
+    groups: list[DuplicateGroup]
+    total: int
+
+
+class DuplicateStats(BaseModel):
+    """Summary of pending duplicate work."""
+    total_groups: int
+    total_duplicate_transactions: int
+
+
+class ResolveAction(str, Enum):
+    CONFIRM_ALL = "confirm_all"          # All members are duplicates; keep lowest ID
+    DISMISS_ALL = "dismiss_all"          # None are duplicates; add all pairs to exceptions
+    CONFIRM_SELECTED = "confirm_selected"  # Only selected IDs are duplicates
+
+
+class ResolveDuplicatesRequest(BaseModel):
+    """Resolve one duplicate group."""
+    transaction_ids: list[int]           # All IDs in the group
+    action: ResolveAction
+    selected_duplicate_ids: list[int] = []  # Used only for CONFIRM_SELECTED
