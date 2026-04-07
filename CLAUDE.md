@@ -51,6 +51,24 @@ finances-workspace/
 │   ├── 01-transactions-to-load/    ← Pending files (status: pending)
 │   └── 02-loaded-transactions/     ← Loaded files (status: imported, audit trail)
 │
+├── web/                            ← Finance Control Panel (FastAPI + React/Vite)
+│   ├── CONTEXT.md
+│   ├── README.md
+│   ├── DARK_MODE_GUIDE.md
+│   ├── backend/                    ← FastAPI server (port 8000)
+│   │   ├── main.py
+│   │   ├── db.py
+│   │   ├── models.py
+│   │   ├── requirements.txt
+│   │   └── routers/                ← accounts, transactions, notifications, actions, duplicates
+│   └── frontend/                   ← React + TypeScript + Vite (port 5173)
+│       └── src/
+│           ├── api/                ← API client functions
+│           ├── components/         ← Reusable UI components
+│           ├── pages/              ← Route-level page components
+│           ├── types/              ← TypeScript interfaces
+│           └── context/            ← React context providers
+│
 └── ingestion/                      ← Parses receipts, invoices, and bank statements
     ├── CONTEXT.md
     ├── docs/
@@ -81,6 +99,7 @@ finances-workspace/
 | **Apply schema migrations** | Run `python db/migrate.py` |
 | **Scan Gmail for bank notifications** | `bank-notifications/CONTEXT.md` |
 | **Load bank notifications to DB** | `python db/load_notification.py` |
+| **Run or modify the web UI** | `web/CONTEXT.md` |
 
 ---
 
