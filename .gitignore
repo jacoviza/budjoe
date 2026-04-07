@@ -8,4 +8,9 @@ ingestion/workflows/03-transform/transactions/**
 ingestion/workflows/03-transform/receipts/**
 ingestion/parsed-files/**
 db/finance.db**
-db/__pycache__/**
+db/__pycache__/
+
+web/backend/__pycache__/**
+web/backend/routers/__pycache__/**
+
+web/frontend/node_modules/**

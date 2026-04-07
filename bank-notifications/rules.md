@@ -60,6 +60,31 @@ from:alertas@scotiabank.com.do (subject:"Compra aprobada" OR subject:"Cargo real
 
 ---
 
+## Qik
+
+**Sender:** `notificaciones@qik.do`
+
+**Subject patterns (any match triggers extraction):**
+- `Usaste tu tarjeta de crédito Qik`
+- `Se reversó una transacción en tu tarjeta de crédito Qik`
+
+
+**Gmail query:**
+```
+from:notificaciones@qik.do (subject:"Usaste tu tarjeta de crédito Qik" OR subject:"Se reversó una transacción en tu tarjeta de crédito Qik")
+```
+
+**Institution:** `Qik`
+**Account type:** `credit_card`
+
+**Extraction hints:**
+- Merchant: look for "Lugar:", "Comercio:", or "Merchant:"
+- Amount: look for "Monto", preceded by "RD$" or "US$"
+- Currency: `USD` if "US$" appears, else `DOP`
+- Card last 4: look for "Tarjeta No." followed by asterisks and 4 digits
+- tx_type: `debit` for purchases; `credit` for reversals
+- datetime: look for "Fecha y hora" field
+
 ## Banco Popular
 
 **Sender:** `alertas@mail.bpd.com.do`

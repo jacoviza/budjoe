@@ -1,0 +1,158 @@
+.container {
+  max-width: 1200px;
+}
+
+.loading,
+.error,
+.empty {
+  padding: 20px;
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.error {
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid var(--danger-color);
+}
+
+.empty {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.actionBar {
+  background-color: var(--bg-primary);
+  padding: 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.actionBar span {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.btnSuccess {
+  padding: 8px 16px;
+  background-color: var(--success-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btnSuccess:hover:not(:disabled) {
+  background-color: var(--success-text);
+}
+
+.btnDanger {
+  padding: 8px 16px;
+  background-color: var(--danger-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btnDanger:hover:not(:disabled) {
+  background-color: var(--danger-text);
+}
+
+.btnSuccess:disabled,
+.btnDanger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tableWrapper {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  background-color: var(--bg-tertiary);
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.table th input {
+  cursor: pointer;
+}
+
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+}
+
+.table td input {
+  cursor: pointer;
+}
+
+.table tbody tr:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.table tbody tr.selected {
+  background-color: var(--info-bg);
+}
+
+.amount {
+  font-weight: 600;
+  text-align: right;
+  font-family: monospace;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btnSmallSuccess,
+.btnSmallDanger {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btnSmallSuccess {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.btnSmallSuccess:hover {
+  background-color: var(--success-text);
+}
+
+.btnSmallDanger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btnSmallDanger:hover {
+  background-color: var(--danger-text);
+}

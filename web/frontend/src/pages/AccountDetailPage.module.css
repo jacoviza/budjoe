@@ -1,0 +1,110 @@
+.container {
+  max-width: 1200px;
+}
+
+.backButton {
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  background-color: var(--text-secondary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.backButton:hover {
+  background-color: var(--text-muted);
+}
+
+.header {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.header h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  color: var(--text-primary);
+}
+
+.accountType {
+  margin: 0;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.header p {
+  margin: 4px 0;
+  color: var(--text-secondary);
+}
+
+.balance {
+  text-align: right;
+}
+
+.amount {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+.section {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.statementsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.statement {
+  padding: 15px;
+  background-color: var(--bg-tertiary);
+  border-left: 3px solid var(--accent-color);
+  border-radius: 4px;
+}
+
+.statement strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.statement p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.loading,
+.error {
+  padding: 20px;
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+}
+
+.error {
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid var(--danger-color);
+}
